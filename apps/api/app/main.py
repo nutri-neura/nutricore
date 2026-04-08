@@ -7,10 +7,13 @@ from psycopg import connect
 from redis import Redis
 from starlette.responses import Response
 
-
 REQUEST_COUNTER = Counter("api_requests_total", "Total API requests")
 POSTGRES_UP = Gauge("api_postgres_up", "Postgres connectivity status")
 REDIS_UP = Gauge("api_redis_up", "Redis connectivity status")
+
+
+def app_env() -> str:
+    return os.getenv("APP_ENV", "development").lower()
 
 
 def db_dsn() -> str:
@@ -27,6 +30,7 @@ def redis_client() -> Redis:
     return Redis(
         host=os.getenv("REDIS_HOST", "redis"),
         port=int(os.getenv("REDIS_PORT", "6379")),
+        password=os.getenv("REDIS_PASSWORD"),
         decode_responses=True,
     )
 
@@ -61,7 +65,29 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="DevOps Starter API", lifespan=lifespan)
+def create_app() -> FastAPI:
+    is_production = app_env() == "production"
+
+    return FastAPI(
+        title="DevOps Starter API",
+        lifespan=lifespan,
+        docs_url=None if is_production else "/docs",
+        redoc_url=None if is_production else "/redoc",
+        openapi_url=None if is_production else "/openapi.json",
+    )
+
+
+app = create_app()
+
+
+def readiness_payload() -> dict[str, bool | str]:
+    postgres_ok = postgres_check()
+    redis_ok = redis_check()
+    return {
+        "status": "ready" if postgres_ok and redis_ok else "degraded",
+        "postgres": postgres_ok,
+        "redis": redis_ok,
+    }
 
 
 @app.get("/")
@@ -83,13 +109,7 @@ def health():
 @app.get("/ready")
 def ready():
     REQUEST_COUNTER.inc()
-    postgres_ok = postgres_check()
-    redis_ok = redis_check()
-    return {
-        "status": "ready" if postgres_ok and redis_ok else "degraded",
-        "postgres": postgres_ok,
-        "redis": redis_ok,
-    }
+    return readiness_payload()
 
 
 @app.get("/demo")
@@ -97,11 +117,12 @@ def demo():
     REQUEST_COUNTER.inc()
     cache = redis_client()
     visits = cache.incr("api_demo_visits")
+    status = readiness_payload()
     return {
         "service": "api",
         "visits": visits,
-        "postgres": postgres_check(),
-        "redis": redis_check(),
+        "postgres": status["postgres"],
+        "redis": status["redis"],
     }
 
 

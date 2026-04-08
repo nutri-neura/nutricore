@@ -2,17 +2,23 @@ services:
   traefik:
     image: traefik:v3.3
     command:
-      - --api.dashboard=true
-      - --api.insecure=true
+      - --api.dashboard=false
       - --providers.file.filename=/etc/traefik/dynamic.yml
       - --entrypoints.web.address=:80
       - --ping=true
       - --metrics.prometheus=true
-    ports:
-      - "${TRAEFIK_PORT:-80}:80"
-      - "8080:8080"
     volumes:
       - ../proxy/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+    mem_limit: 128m
+    cpus: 0.50
+    pids_limit: 128
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
       interval: 10s
@@ -33,11 +39,22 @@ services:
       POSTGRES_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+    mem_limit: 256m
+    cpus: 1.00
+    pids_limit: 256
     healthcheck:
       test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/health')"]
       interval: 15s
@@ -57,8 +74,18 @@ services:
     depends_on:
       api:
         condition: service_healthy
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+    mem_limit: 256m
+    cpus: 1.00
+    pids_limit: 256
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -73,6 +100,13 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-starter_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+    mem_limit: 512m
+    cpus: 1.00
+    pids_limit: 256
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-starter} -d ${POSTGRES_DB:-starter}"]
       interval: 10s
@@ -83,14 +117,23 @@ services:
 
   redis:
     image: redis:8-alpine
-    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning", "--requirepass", "${REDIS_PASSWORD}"]
     volumes:
       - redis_data:/data
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+    mem_limit: 256m
+    cpus: 0.50
+    pids_limit: 128
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a \"$${REDIS_PASSWORD}\" ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
     networks:
       - backend
 
@@ -102,6 +145,16 @@ services:
     volumes:
       - ../monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+    mem_limit: 256m
+    cpus: 1.00
+    pids_limit: 128
     networks:
       - observability
       - edge
@@ -114,6 +167,16 @@ services:
     volumes:
       - ../monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
       - grafana_data:/var/lib/grafana
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+    mem_limit: 384m
+    cpus: 1.00
+    pids_limit: 256
     depends_on:
       - prometheus
     networks:
