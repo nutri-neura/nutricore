@@ -1,13 +1,13 @@
 :root {
   color-scheme: light;
-  --bg: #f3efe7;
-  --bg-accent: #e8dcc7;
-  --surface: rgba(255, 250, 243, 0.78);
-  --line: rgba(87, 64, 35, 0.18);
-  --text: #20150a;
-  --muted: #6e5b45;
-  --accent: #b35c2e;
-  --accent-dark: #7c3b19;
+  --bg: #eef4ed;
+  --bg-accent: #d7ead7;
+  --surface: rgba(252, 255, 251, 0.8);
+  --line: rgba(32, 76, 55, 0.16);
+  --text: #112218;
+  --muted: #496053;
+  --accent: #2d8a5d;
+  --accent-dark: #1f5d40;
 }
 
 * {
@@ -19,8 +19,9 @@ body {
   margin: 0;
   min-height: 100%;
   background:
-    radial-gradient(circle at top left, rgba(179, 92, 46, 0.22), transparent 32%),
-    linear-gradient(180deg, var(--bg) 0%, #f8f4ed 100%);
+    radial-gradient(circle at top left, rgba(45, 138, 93, 0.18), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(109, 185, 146, 0.18), transparent 30%),
+    linear-gradient(180deg, var(--bg) 0%, #f7fbf5 100%);
   color: var(--text);
   font-family: Georgia, "Times New Roman", serif;
 }
@@ -73,7 +74,7 @@ body {
   padding: 24px;
   background: var(--surface);
   backdrop-filter: blur(12px);
-  box-shadow: 0 18px 50px rgba(64, 39, 18, 0.08);
+  box-shadow: 0 18px 50px rgba(22, 53, 38, 0.08);
 }
 
 .card h2 {
@@ -81,7 +82,7 @@ body {
 }
 
 .accent {
-  background: linear-gradient(145deg, rgba(179, 92, 46, 0.12), rgba(255, 250, 243, 0.86));
+  background: linear-gradient(145deg, rgba(45, 138, 93, 0.14), rgba(252, 255, 251, 0.88));
 }
 
 ul {
@@ -94,9 +95,15 @@ pre {
   overflow-x: auto;
   padding: 16px;
   border-radius: 16px;
-  background: rgba(32, 21, 10, 0.92);
-  color: #f8f4ed;
+  background: rgba(17, 34, 24, 0.94);
+  color: #eff8f0;
   font-size: 0.9rem;
+}
+
+.footer-note {
+  margin-top: 28px;
+  color: var(--muted);
+  line-height: 1.7;
 }
 
 @media (max-width: 640px) {

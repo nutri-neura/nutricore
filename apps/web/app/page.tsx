@@ -5,21 +5,27 @@ async function getApiStatus() {
     "http://api:8000";
 
   try {
-    const response = await fetch(`${baseUrl}/demo`, {
-      cache: "no-store",
-    });
+    const [healthResponse, bootstrapResponse] = await Promise.all([
+      fetch(`${baseUrl}/health`, {
+        cache: "no-store",
+      }),
+      fetch(`${baseUrl}/v1/auth/bootstrap-status`, {
+        cache: "no-store",
+      }),
+    ]);
 
-    if (!response.ok) {
+    if (!healthResponse.ok || !bootstrapResponse.ok) {
       throw new Error("API response was not ok");
     }
 
-    return response.json();
+    return {
+      status: "ok",
+      bootstrap: await bootstrapResponse.json(),
+    };
   } catch {
     return {
-      service: "api",
-      visits: null,
-      postgres: false,
-      redis: false,
+      status: "offline",
+      bootstrap: null,
       error: "API no disponible todavia",
     };
   }
@@ -31,28 +37,45 @@ export default async function Home() {
   return (
     <main className="page">
       <section className="hero">
-        <p className="eyebrow">DevOps Starter</p>
-        <h1>Infra realista para empezar proyectos sin improvisar.</h1>
+        <p className="eyebrow">NutriCore</p>
+        <h1>Base operativa para consulta nutricional seria.</h1>
         <p className="lede">
-          Stack base con FastAPI, Next.js, PostgreSQL, Redis, Traefik,
-          Prometheus y Grafana.
+          El starter ya fue adaptado para arrancar el producto: autenticacion,
+          usuarios, persistencia inicial y una ruta clara para construir
+          pacientes, evaluaciones y planes.
         </p>
       </section>
 
       <section className="grid">
         <article className="card">
-          <h2>Estado del starter</h2>
+          <h2>Fase actual</h2>
           <ul>
-            <li>Frontend corriendo detras del proxy</li>
-            <li>Backend con endpoints de health y metrics</li>
-            <li>Monitoreo listo para iterar</li>
+            <li>Backend reorganizado por modulos</li>
+            <li>Login JWT y endpoints protegidos</li>
+            <li>Seed inicial de admin y migracion base</li>
           </ul>
         </article>
 
         <article className="card accent">
-          <h2>Respuesta de la API</h2>
+          <h2>Lo siguiente</h2>
+          <ul>
+            <li>Modulo de pacientes y expediente</li>
+            <li>Consultas y mediciones</li>
+            <li>Evaluaciones con formulas versionadas</li>
+          </ul>
+        </article>
+
+        <article className="card">
+          <h2>Estado de API</h2>
           <pre>{JSON.stringify(api, null, 2)}</pre>
         </article>
+      </section>
+
+      <section className="footer-note">
+        <p>
+          Primer acceso esperado: usa el admin bootstrap definido en `.env` para
+          autenticarte contra `POST /v1/auth/login`.
+        </p>
       </section>
     </main>
   );

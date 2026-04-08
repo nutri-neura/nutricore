@@ -1,11 +1,11 @@
-# DevOps Starter
+# NutriCore
 
-Starter reutilizable para desplegar aplicaciones modernas con buenas practicas DevOps desde el inicio.
+Plataforma base para construir un sistema de consulta nutricional con buenas practicas DevOps desde el inicio.
 
 ## Stack inicial
 
-- FastAPI para API demo
-- Next.js para frontend demo
+- FastAPI para API de NutriCore
+- Next.js para frontend de NutriCore
 - Traefik como reverse proxy
 - PostgreSQL
 - Redis
@@ -17,7 +17,7 @@ Starter reutilizable para desplegar aplicaciones modernas con buenas practicas D
 ## Estructura
 
 ```text
-devops-starter/
+nutricore/
 ├── apps/
 │   ├── api/
 │   └── web/
@@ -68,13 +68,13 @@ Seguridad HTTP:
 
 ## Objetivo de esta primera version
 
-- scaffold funcional y ordenado
+- plataforma funcional y ordenada
 - servicios dockerizados por separado
 - compose unico para desarrollo local
 - healthchecks
 - monitoreo base
-- pipeline CI inicial
-- documentacion inicial
+- base lista para auth, pacientes y evaluaciones
+- documentacion inicial de producto y dominio
 
 ## Modos de compose
 

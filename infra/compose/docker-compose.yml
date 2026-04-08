@@ -32,14 +32,22 @@ services:
     build:
       context: ../../apps/api
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-starter}
-      POSTGRES_USER: ${POSTGRES_USER:-starter}
+      APP_NAME: ${APP_NAME:-NutriCore}
+      APP_ENV: ${APP_ENV:-development}
+      POSTGRES_DB: ${POSTGRES_DB:-nutricore}
+      POSTGRES_USER: ${POSTGRES_USER:-nutricore}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-starter_password}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+      NUTRICORE_JWT_SECRET: ${NUTRICORE_JWT_SECRET}
+      NUTRICORE_JWT_ACCESS_TOKEN_EXPIRE_MINUTES: ${NUTRICORE_JWT_ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+      NUTRICORE_BOOTSTRAP_ADMIN_ENABLED: ${NUTRICORE_BOOTSTRAP_ADMIN_ENABLED:-true}
+      NUTRICORE_BOOTSTRAP_ADMIN_NAME: ${NUTRICORE_BOOTSTRAP_ADMIN_NAME:-NutriCoreAdmin}
+      NUTRICORE_BOOTSTRAP_ADMIN_EMAIL: ${NUTRICORE_BOOTSTRAP_ADMIN_EMAIL:-admin@nutricore.app}
+      NUTRICORE_BOOTSTRAP_ADMIN_PASSWORD: ${NUTRICORE_BOOTSTRAP_ADMIN_PASSWORD}
     depends_on:
       postgres:
         condition: service_healthy
@@ -95,8 +103,8 @@ services:
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-starter}
-      POSTGRES_USER: ${POSTGRES_USER:-starter}
+      POSTGRES_DB: ${POSTGRES_DB:-nutricore}
+      POSTGRES_USER: ${POSTGRES_USER:-nutricore}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-starter_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -108,7 +116,7 @@ services:
     cpus: 1.00
     pids_limit: 256
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-starter} -d ${POSTGRES_DB:-starter}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nutricore} -d ${POSTGRES_DB:-nutricore}"]
       interval: 10s
       timeout: 5s
       retries: 5

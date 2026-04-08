@@ -2,8 +2,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "DevOps Starter",
-  description: "Starter DevOps con FastAPI, Next.js y Docker Compose",
+  title: "NutriCore",
+  description: "Plataforma para consulta nutricional con FastAPI, Next.js y Docker Compose",
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body>{children}</body>
     </html>
   );

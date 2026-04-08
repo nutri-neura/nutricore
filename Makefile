@@ -14,7 +14,7 @@ TRAEFIK_PROD_DYNAMIC_FILE := infra/proxy/traefik/generated/dynamic.prod.yml
 TRAEFIK_PROD_ADMIN_DYNAMIC_TEMPLATE := infra/proxy/traefik/dynamic.prod.admin.tpl.yml
 TRAEFIK_PROD_ADMIN_DYNAMIC_FILE := infra/proxy/traefik/generated/dynamic.prod.admin.yml
 
-.PHONY: setup install install-api install-web up down logs ps build pull config validate-secrets-dev validate-secrets-prod validate-prod-tls render-traefik-prod render-traefik-prod-admin traefik-admin-users check-prod-admin-secret up-admin down-admin logs-admin ps-admin config-admin up-prod-admin down-prod-admin logs-prod-admin ps-prod-admin config-prod-admin bootstrap deploy backup restore up-prod down-prod logs-prod ps-prod config-prod lint lint-fix test
+.PHONY: setup install install-api install-web up down logs ps build pull config validate-secrets-dev validate-secrets-prod validate-prod-tls render-traefik-prod render-traefik-prod-admin traefik-admin-users check-prod-admin-secret up-admin down-admin logs-admin ps-admin config-admin up-prod-admin down-prod-admin logs-prod-admin ps-prod-admin config-prod-admin bootstrap deploy backup restore up-prod down-prod logs-prod ps-prod config-prod lint lint-fix test migrate-api
 
 setup:
 	cp -n .env.example .env || true
@@ -25,6 +25,11 @@ install-api:
 	python3 -m venv $(API_VENV)
 	$(API_PYTHON) -m pip install --upgrade pip
 	$(API_PYTHON) -m pip install -r apps/api/requirements.txt
+
+migrate-api:
+	$(MAKE) validate-secrets-dev
+	$(COMPOSE_DEV) up -d postgres redis
+	$(COMPOSE_DEV) run --rm api alembic upgrade head
 
 install-web:
 	cd apps/web && npm install
