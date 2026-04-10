@@ -45,6 +45,10 @@ class Settings(BaseSettings):
         alias="NUTRICORE_BOOTSTRAP_ADMIN_ENABLED",
     )
     database_url: str | None = Field(default=None, alias="DATABASE_URL")
+    cors_allowed_origins_raw: str = Field(
+        default="http://web.localhost,http://web.localhost:8080,http://localhost:3000",
+        alias="NUTRICORE_CORS_ALLOWED_ORIGINS",
+    )
 
     @property
     def is_production(self) -> bool:
@@ -69,6 +73,14 @@ class Settings(BaseSettings):
             f"password={self.postgres_password} host={self.postgres_host} "
             f"port={self.postgres_port}"
         )
+
+    @property
+    def cors_allowed_origins(self) -> list[str]:
+        return [
+            origin.strip()
+            for origin in self.cors_allowed_origins_raw.split(",")
+            if origin.strip()
+        ]
 
 
 @lru_cache

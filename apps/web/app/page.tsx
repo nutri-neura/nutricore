@@ -50,18 +50,18 @@ export default async function Home() {
         <article className="card">
           <h2>Fase actual</h2>
           <ul>
-            <li>Backend reorganizado por modulos</li>
             <li>Login JWT y endpoints protegidos</li>
-            <li>Seed inicial de admin y migracion base</li>
+            <li>Pacientes, expediente, consultas y mediciones</li>
+            <li>Evaluaciones versionadas con GET base para adultos</li>
           </ul>
         </article>
 
         <article className="card accent">
-          <h2>Lo siguiente</h2>
+          <h2>Siguiente bloque</h2>
           <ul>
-            <li>Modulo de pacientes y expediente</li>
-            <li>Consultas y mediciones</li>
-            <li>Evaluaciones con formulas versionadas</li>
+            <li>Estrategia nutricional sobre resultados calculados</li>
+            <li>Distribucion diaria y estructura del plan</li>
+            <li>Editor de plan y salida PDF</li>
           </ul>
         </article>
 
@@ -69,6 +69,13 @@ export default async function Home() {
           <h2>Estado de API</h2>
           <pre>{JSON.stringify(api, null, 2)}</pre>
         </article>
+      </section>
+
+      <section className="footer-note">
+        <p>
+          Dashboard actual disponible en <a href="/patients">/patients</a> para
+          listar pacientes, revisar consultas y ejecutar evaluaciones con JWT.
+        </p>
       </section>
 
       <section className="footer-note">
